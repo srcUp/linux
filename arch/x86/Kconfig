@@ -1924,6 +1924,33 @@ config EFI_MIXED
 
 	   If unsure, say N.
 
+config SECURE_LAUNCH
+	bool "Secure Launch support"
+	default n
+	depends on X86_64
+	help
+	  This Secure Launch kernel feature allows a bzImage to be loaded
+	  directly through Intel TXT or AMD SKINIT measured launch. This
+	  allows extablishing a Dynamic Root of Trust Measurement (DRTM)
+	  of all the modules and configuration information used for
+	  boooting the operating system.
+
+config SECURE_LAUNCH_SHA256
+	bool "Secure Launch TPM2 SHA256"
+	default y
+	depends on SECURE_LAUNCH
+	help
+	  When using Secure Launch and TPM2 is present, use SHA256 hash
+	  algorithm for measurements.
+
+config SECURE_LAUNCH_SHA512
+	bool "Secure Launch TPM2 SHA512"
+	default n
+	depends on SECURE_LAUNCH && !SECURE_LAUNCH_SHA256
+	help
+	  When using Secure Launch and TPM2 is present, use SHA512 hash
+	  algorithm for measurements.
+
 config SECCOMP
 	def_bool y
 	prompt "Enable seccomp to safely compute untrusted bytecode"
