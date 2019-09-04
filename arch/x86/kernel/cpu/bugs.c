@@ -35,6 +35,8 @@
 #include <asm/e820/api.h>
 #include <asm/spec_ctrl.h>
 
+#include <xen/xen.h>
+
 /*
  * use_ibrs flags:
  * SPEC_CTRL_BASIC_IBRS_INUSE		basic ibrs is currently in use
