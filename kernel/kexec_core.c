@@ -39,6 +39,7 @@
 #include <linux/compiler.h>
 #include <linux/hugetlb.h>
 #include <linux/frame.h>
+#include <linux/slaunch.h>
 
 #include <asm/page.h>
 #include <asm/sections.h>
@@ -1113,7 +1114,6 @@ static int __init crash_notes_memory_init(void)
 }
 subsys_initcall(crash_notes_memory_init);
 
-
 /*
  * Move into place and start executing a preloaded standalone
  * executable.  If nothing was preloaded return an error.
@@ -1175,6 +1175,8 @@ int kernel_kexec(void)
 		cpu_hotplug_enable();
 		pr_emerg("Starting new kernel\n");
 		machine_shutdown();
+
+		slaunch_sexit();
 	}
 
 	machine_kexec(kexec_image);
