@@ -653,6 +653,7 @@ static void native_machine_emergency_restart(void)
 
 void native_machine_shutdown(void)
 {
+    printk("native_machine_shutdown enter\n");
 	/* Stop the cpus and apics */
 #ifdef CONFIG_X86_IO_APIC
 	/*
@@ -666,6 +667,8 @@ void native_machine_shutdown(void)
 	 * Even without the erratum, it still makes sense to quiet IO APIC
 	 * before disabling Local APIC.
 	 */
+
+    printk("calling disable IO APIC\n");
 	disable_IO_APIC();
 #endif
 
@@ -675,19 +678,27 @@ void native_machine_shutdown(void)
 	 * not receive the per-cpu timer interrupt which may trigger
 	 * scheduler's load balance.
 	 */
+    printk("calling local_irq_disable\n");
 	local_irq_disable();
-	stop_other_cpus();
-#endif
 
+    printk("calling stop_other_cpus\n");
+	stop_other_cpus();
+
+#endif
+    printk("native_machine_shutdown: calling lapic shutdown\n");
 	lapic_shutdown();
 
 #ifdef CONFIG_HPET_TIMER
+    printk("native_machine_shutdown: calling hpet_disable \n");
 	hpet_disable();
 #endif
 
 #ifdef CONFIG_X86_64
+    printk("native_machine_shutdown: calling x86_platform.iommu_shutdown\n");
 	x86_platform.iommu_shutdown();
 #endif
+
+    printk("native_machine_shutdown: exit \n");
 }
 
 static void __machine_emergency_restart(int emergency)
@@ -744,7 +755,9 @@ void machine_power_off(void)
 
 void machine_shutdown(void)
 {
+    printk("machine_shutdown: %pF at address: %p\n", machine_ops.shutdown, machine_ops.shutdown);
 	machine_ops.shutdown();
+    printk("machine_shutdown: EXIT\n");
 }
 
 void machine_emergency_restart(void)
