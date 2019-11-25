@@ -1120,6 +1120,7 @@ subsys_initcall(crash_notes_memory_init);
  */
 int kernel_kexec(void)
 {
+    pr_emerg("kernel_kexec enter\n");
 	int error = 0;
 
 	if (!mutex_trylock(&kexec_mutex))
@@ -1131,6 +1132,7 @@ int kernel_kexec(void)
 
 #ifdef CONFIG_KEXEC_JUMP
 	if (kexec_image->preserve_context) {
+        pr_emerg("CONFIG_KEXEC_JUMP: if \n");
 		lock_system_sleep();
 		pm_prepare_console();
 		error = freeze_processes();
@@ -1162,6 +1164,7 @@ int kernel_kexec(void)
 	} else
 #endif
 	{
+        pr_emerg("CONFIG_KEXEC_JUMP: else \n");
 		kexec_in_progress = true;
 		kernel_restart_prepare(NULL);
 		migrate_to_reboot_cpu();
@@ -1173,12 +1176,17 @@ int kernel_kexec(void)
 		 * CPU hotplug again; so re-enable it here.
 		 */
 		cpu_hotplug_enable();
-		pr_emerg("Starting new kernel\n");
+		pr_emerg("Starting new kernel HELOOOOOOOOO\n");
 		machine_shutdown();
 
+		pr_emerg("Calling slaunch EXIT\n");
 		slaunch_sexit();
+
+		pr_emerg("leaving slaunch EXIT\n");
 	}
 
+
+	pr_emerg("Calling machine_kexec\n");
 	machine_kexec(kexec_image);
 
 #ifdef CONFIG_KEXEC_JUMP

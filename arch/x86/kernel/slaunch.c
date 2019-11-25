@@ -658,8 +658,11 @@ void slaunch_sexit(void)
 	void __iomem *config;
 	u64 one = 1, val;
 
-	if (!(slaunch_get_flags() & (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT)))
+	if (!(slaunch_get_flags() & (SL_FLAG_ACTIVE|SL_FLAG_ARCH_TXT))) {
+	    printk(KERN_ERR PREFIX " flags error ");
+		pr_err("Error SEXIT flags error \n");
 		return;
+    }
 
 	if (smp_processor_id() != 0) {
 		pr_err("Error TXT SEXIT must be called on CPU 0\n");
@@ -701,13 +704,17 @@ void slaunch_sexit(void)
 		return;
 	}
 
+
+	printk(KERN_ERR PREFIX " slaunch sexit 3");
 	memcpy_fromio(&val, config + TXTCR_E2STS, sizeof(u64));
 
 	/* Disable SMX mode */
 	cr4_set_bits(X86_CR4_SMXE);
 
+	printk(KERN_ERR PREFIX " slaunch sexit 4");
 	/* Do the SEXIT SMX operation */
 	txt_getsec_sexit();
 
+	printk(KERN_ERR PREFIX " slaunch sexit 5");
 	pr_info("TXT SEXIT complete.");
 }
