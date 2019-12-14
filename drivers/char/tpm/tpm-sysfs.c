@@ -191,6 +191,50 @@ out_ops:
 }
 static DEVICE_ATTR_RO(owned);
 
+static ssize_t locality_show(struct device *dev, struct device_attribute *attr,
+			 char *buf)
+{
+	struct tpm_chip *chip = to_tpm_chip(dev);
+	int rc;
+
+	if (tpm_try_get_ops(chip))
+		return 0;
+
+	rc = sprintf(buf, "%d\n", chip->locality);
+
+	tpm_put_ops(chip);
+	return rc;
+}
+
+static ssize_t locality_store(struct device *dev, struct device_attribute *attr,
+			    const char *buf, size_t count)
+{
+	struct tpm_chip *chip = to_tpm_chip(dev);
+	int rc = 0, l = 0;
+
+	if (tpm_try_get_ops(chip))
+		return 0;
+
+	if (!chip->ops->request_locality)
+		goto out_ops;
+
+	rc =sscanf(buf, "%d", &l);
+	if (rc != 1)
+		goto out_ops;
+
+	rc = chip->ops->request_locality(chip, l);
+	if (rc < 0)
+		goto out_ops;
+
+	chip->locality = l;
+	return 0;
+
+out_ops:
+	tpm_put_ops(chip);
+	return rc;
+}
+static DEVICE_ATTR_RW(locality);
+
 static ssize_t temp_deactivated_show(struct device *dev,
 				     struct device_attribute *attr, char *buf)
 {
@@ -315,6 +359,7 @@ static struct attribute *tpm_dev_attrs[] = {
 	&dev_attr_enabled.attr,
 	&dev_attr_active.attr,
 	&dev_attr_owned.attr,
+	&dev_attr_locality.attr,
 	&dev_attr_temp_deactivated.attr,
 	&dev_attr_caps.attr,
 	&dev_attr_cancel.attr,
