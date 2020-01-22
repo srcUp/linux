@@ -336,7 +336,8 @@ static void __init slaunch_copy_dmar_table(void __iomem *txt)
 
 
 	heap = txt_early_get_heap_table(TXT_SINIT_MLE_DATA_TABLE,
-					dmarvals[DMAR_SIZE]);
+					dmarvals[DMAR_OFFSET] +
+					dmarvals[DMAR_SIZE] - 8);
 	if (!heap)
 		slaunch_txt_reset(txt,
 				  "Error early_ioremap of DMAR\n",
