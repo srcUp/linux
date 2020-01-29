@@ -11,6 +11,22 @@
 
 #ifdef CONFIG_SECURE_LAUNCH
 
+/* 
+ * can't use printk directly because early
+ * code i.e. arch/x86/boot/compressed
+ * includes this file and that code doesn't have printk support.
+ * therefore need PRINTK_HACKERY to do nothing when early code
+ * gets executed.
+ */ 
+#ifdef PRINTK_HACKERY
+#define PREFIX  "SLAUNCH: "
+#define slaunch_printk(x, ...) do {} while(0)
+//#define slaunch_printk(x, ...) printf(x)
+#else
+#define slaunch_printk(x, ...) printk(x)
+#define PREFIX  "SLAUNCH: "
+#endif
+
 /*
  * Secure Launch main definitions file.
  *
@@ -451,24 +467,32 @@ static inline int tpm20_log_event(struct txt_heap_event_log_pointer2_1_element *
 				  void *evtlog_base,
 				  u32 event_size, void *event)
 {
+    // slaunch_printk(KERN_ERR PREFIX " tpm20_log_event enter\n");
 	struct tpm12_pcr_event *header =
 		(struct tpm12_pcr_event *)evtlog_base;
 
 	/* Has to be at least big enough for the signature */
-	if (header->size < sizeof(TPM20_EVTLOG_SIGNATURE))
+	if (header->size < sizeof(TPM20_EVTLOG_SIGNATURE)) {
+        slaunch_printk(KERN_ERR PREFIX " tpm20_log_event err 1\n");
 		return -EINVAL;
+    }
 
 	if (memcmp((u8 *)header + sizeof(struct tpm12_pcr_event),
-		   TPM20_EVTLOG_SIGNATURE, sizeof(TPM20_EVTLOG_SIGNATURE)))
+		   TPM20_EVTLOG_SIGNATURE, sizeof(TPM20_EVTLOG_SIGNATURE))) {
+        slaunch_printk(KERN_ERR PREFIX " tpm20_log_event err 2\n");
 		return -EINVAL;
+    }
 
 	if (elem->next_record_offset + event_size >
-	    elem->allocated_event_container_size)
+	    elem->allocated_event_container_size) {
+        slaunch_printk(KERN_ERR PREFIX " tpm20_log_event err 3\n");
 		return -E2BIG;
+    }
 
 	memcpy(evtlog_base + elem->next_record_offset, event, event_size);
 	elem->next_record_offset += event_size;
 
+    // slaunch_printk(KERN_ERR PREFIX " tpm20_log_event exit with elem->next_record_offset=%u\n", elem->next_record_offset);
 	return 0;
 }
 

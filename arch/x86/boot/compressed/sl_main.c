@@ -15,7 +15,13 @@
 #include <asm/tpm.h>
 #include <asm/bootparam.h>
 #include <asm/efi.h>
+#define PRINTK_HACKERY
+#include "misc.h"
+// #include "sl.h"
 #include <linux/slaunch.h>
+
+// #include <stdio.h> // fatal error: stdio.h: No such file or directory
+
 #ifdef CONFIG_SECURE_LAUNCH_SHA256
 #include <linux/sha256.h>
 #endif
@@ -180,6 +186,7 @@ static void sl_tpm12_log_event(u32 pcr, u8 *digest,
 static void sl_tpm20_log_event(u32 pcr, u8 *digest, u16 algo,
 			       const u8 *event_data, u32 event_size)
 {
+    // debug_putstr("sl_tpm20_log_event enter\n");
 	struct tpm20_pcr_event_head *head;
 	struct tpm20_digest_values *dvs;
 	struct tpm20_ha *ha;
@@ -227,6 +234,8 @@ static void sl_tpm20_log_event(u32 pcr, u8 *digest, u16 algo,
 
 	if (tpm20_log_event(log20_elem, evtlog_base, total_size, &log_buf[0]))
 		sl_txt_reset(TXT_SLERROR_TPM_LOGGING_FAILED);
+
+    // debug_putstr(KERN_ERR PREFIX "sl_tpm20_log_event exit\n");
 }
 
 void sl_tpm_extend_pcr(struct tpm *tpm, u32 pcr, const u8 *data, u32 length,

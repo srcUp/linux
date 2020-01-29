@@ -484,16 +484,23 @@ static DEFINE_MUTEX(sl_evt_write_mutex);
 static ssize_t sl_evtlog_read(struct file *file, char __user *buf,
 			      size_t count, loff_t *pos)
 {
-	return simple_read_from_buffer(buf, count, pos,
+    // printk(KERN_ERR PREFIX "sl_evtlog_read called");
+    ssize_t ret = simple_read_from_buffer(buf, count, pos,
 		sl_evtlog.addr, sl_evtlog.size);
+    // printk(KERN_ERR PREFIX "ret = %d", (int)ret);
+    return ret;
 }
 
+/*
+ * sl_evtlog_write() assumes it was passed an already correctly formed event.
+ */
 static ssize_t sl_evtlog_write(struct file *file, const char __user *buf,
 				size_t datalen, loff_t *ppos)
 {
 	char *data;
 	ssize_t result;
 
+    // printk(KERN_ERR PREFIX " sl_evtlog_write ENTER with datalen=%u", datalen);
 	/* No partial writes. */
 	result = -EINVAL;
 	if (*ppos != 0)
@@ -504,11 +511,14 @@ static ssize_t sl_evtlog_write(struct file *file, const char __user *buf,
 		result = PTR_ERR(data);
 		goto out;
 	}
-
-	mutex_lock(&sl_evt_write_mutex);
-	if (evtlog20)
-		result = tpm20_log_event(evtlog20, sl_evtlog.addr,
-					 datalen, data);
+	
+    mutex_lock(&sl_evt_write_mutex);
+	if (evtlog20) {
+        // printk(KERN_ERR PREFIX " calling tpm20_log_event");
+		result = tpm20_log_event(evtlog20, sl_evtlog.addr, datalen, data);
+        // printk(KERN_ERR PREFIX " tpm20_log_event: result = %d", (int)result);
+        // printk(KERN_ERR PREFIX " tpm20_log_event: sl_evtlog.size = %d", (int)sl_evtlog.size);
+    }
 	else
 		result = tpm12_log_event(sl_evtlog.addr, datalen, data);
 	mutex_unlock(&sl_evt_write_mutex);

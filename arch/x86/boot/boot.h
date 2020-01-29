@@ -25,7 +25,8 @@
 #include <linux/edd.h>
 #include <asm/setup.h>
 #include <asm/asm.h>
-#include "bitops.h"
+// #include "bitops.h"
+#include "linux/bitops.h"
 #include "ctype.h"
 #include "cpuflags.h"
 
