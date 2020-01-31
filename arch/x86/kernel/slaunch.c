@@ -347,7 +347,8 @@ static void __init slaunch_copy_dmar_table(void __iomem *txt)
 		      (void *)(heap + dmarvals[DMAR_OFFSET] - 8),
 		      dmarvals[DMAR_SIZE]);
 
-	early_iounmap(heap, dmarvals[DMAR_SIZE]);
+	early_iounmap(heap, dmarvals[DMAR_OFFSET] +
+			    dmarvals[DMAR_SIZE] - 8);
 }
 
 /*
