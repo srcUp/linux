@@ -73,7 +73,6 @@ $(obj)/misc.o: $(obj)/../voffset.h
 vmlinux-objs-y := $(obj)/vmlinux.lds $(obj)/head_$(BITS).o $(obj)/misc.o \
 	$(obj)/string.o $(obj)/cmdline.o $(obj)/error.o \
 	$(obj)/piggy.o $(obj)/cpuflags.o
-# $(obj)/piggy.o $(obj)/cpuflags.o $(obj)/printf.o
 
 vmlinux-objs-$(CONFIG_EARLY_PRINTK) += $(obj)/early_serial_console.o
 vmlinux-objs-$(CONFIG_RANDOMIZE_BASE) += $(obj)/kaslr.o
@@ -91,8 +90,6 @@ vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_thunk_$(BITS).o
 
 vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/early_sha1.o \
 	$(obj)/early_tpm.o $(obj)/sl_main.o $(obj)/sl_stub.o
-	#$(obj)/early_tpm.o $(obj)/tty.o $(obj)/regs.o $(obj)/bioscall.o $(obj)/printf.o $(obj)/sl_main.o $(obj)/sl_stub.o
-
 vmlinux-objs-$(CONFIG_SECURE_LAUNCH_SHA256) += $(obj)/early_sha256.o
 vmlinux-objs-$(CONFIG_SECURE_LAUNCH_SHA512) += $(obj)/early_sha512.o
 
